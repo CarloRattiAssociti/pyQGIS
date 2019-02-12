@@ -1,0 +1,20 @@
+layer = iface.activeLayer()
+
+temp = QgsVectorLayer("Point?crs=epsg:2154", "result", "memory")
+temp.startEditing()
+
+attrs = layer.dataProvider().fields().toList()
+temp_prov = temp.dataProvider()
+temp_prov.addAttributes(attrs)
+temp.updateFields()
+
+for elem in layer.getFeatures():
+    feat = QgsFeature()
+    geom = elem.geometry().interpolate(elem.geometry().length()/2)
+    feat.setGeometry(geom)
+    feat.setAttributes(elem.attributes())
+    temp.addFeatures([feat])
+    temp.updateExtents()
+
+temp.commitChanges()
+QgsMapLayerRegistry.instance().addMapLayer(temp)
